@@ -14,6 +14,7 @@ from app.db import db
 from app.db.models import User
 from app.error_handlers import error_handlers
 from app.logging_config import log_con, LOGGING_CONFIG
+from app.simple_pages import simple_pages
 from app.db import database
 from flask_cors import CORS
 login_manager = flask_login.LoginManager()
@@ -29,8 +30,15 @@ def create_app():
     elif os.environ.get("FLASK_ENV") == "testing":
         app.config.from_object("app.config.TestingConfig")
 
+    # https://flask-login.readthedocs.io/en/latest/  <-login manager
+    login_manager.init_app(app)
+    # Needed for CSRF protection of form submissions and WTF Forms
+    # https://wtforms.readthedocs.io/en/3.0.x/
+    csrf = CSRFProtect(app)
     # https://bootstrap-flask.readthedocs.io/en/stable/
     bootstrap = Bootstrap5(app)
+    # these load functions with web interface
+    app.register_blueprint(simple_pages)
     app.register_blueprint(database)
     # these load functionality without a web interface
     app.register_blueprint(log_con)
@@ -44,8 +52,12 @@ def create_app():
     }
     CORS(app, resources={"/api/*": api_v1_cors_config})
     # Run once at startup:
-    @app.route('/')
-    def hello():
-        return 'Hello, World!'
-
     return app
+
+
+@login_manager.user_loader
+def user_loader(user_id):
+    try:
+        return User.query.get(int(user_id))
+    except:
+        return None
