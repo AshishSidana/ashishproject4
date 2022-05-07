@@ -34,7 +34,6 @@ def create_app():
 
     # https://flask-login.readthedocs.io/en/latest/  <-login manager
     login_manager.init_app(app)
-    login_manager.login_view = "auth.login"
     # Needed for CSRF protection of form submissions and WTF Forms
     # https://wtforms.readthedocs.io/en/3.0.x/
     csrf = CSRFProtect(app)
