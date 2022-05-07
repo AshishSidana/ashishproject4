@@ -33,7 +33,11 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNavDropdown">
                     <div class="navbar-nav mr-auto">
-                        {{ render_nav_item('simple_pages.index', 'Home') }}
+                        {% if current_user.is_authenticated %}
+                            {{ render_nav_item('auth.dashboard','Dashboard' ) }}
+                        {% else %}
+                            {{ render_nav_item('simple_pages.index', 'Home') }}
+                        {% endif %}
                         {{ render_nav_item('simple_pages.about','About') }}
                         {{ render_nav_item('simple_pages.welcome','Welcome') }}
                     </div>
@@ -45,8 +49,10 @@
                                data-bs-toggle="dropdown" aria-expanded="false">
                                 My Account
                             </a>
-                            
                         </li>
+                    {% else %}
+                        {{ render_nav_item('auth.register','Register' ) }}
+                        {{ render_nav_item('auth.login','Login' ) }}
                     {% endif %}
                 </div>
             </nav>
@@ -72,7 +78,7 @@
 
 {% endblock %}
 <footer class="text-center mt-5">
-    Environment: {{ deployment_environment }} - Copyright: {{ year }} {{ format_price(100) }}
+    Environment: {{ deployment_environment }} - Copyright: {{ year }}
 </footer>
 </body>
 </html>
