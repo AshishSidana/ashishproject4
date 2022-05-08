@@ -49,6 +49,11 @@
                                data-bs-toggle="dropdown" aria-expanded="false">
                                 My Account
                             </a>
+                            <ul class="dropdown-menu " aria-labelledby="navbarDarkDropdownMenuLink">
+                                <li><a class="dropdown-item" href="{{ url_for("auth.edit_profile") }}">Manage
+                                    Profile</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for("auth.logout") }}">Logout</a></li>
+                            </ul>
                         </li>
                     {% else %}
                         {{ render_nav_item('auth.register','Register' ) }}
@@ -78,7 +83,7 @@
 
 {% endblock %}
 <footer class="text-center mt-5">
-    Environment: {{ deployment_environment }} - Copyright: {{ year }}
+    Environment: {{ deployment_environment }} - Copyright: {{ year }} 
 </footer>
 </body>
 </html>

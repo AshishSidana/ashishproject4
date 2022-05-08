@@ -36,3 +36,21 @@ def test_login_and_redirect_to_dashboard(client, application):
     assert response.request.path == '/dashboard'
     html = response.get_data(as_text=True)
     assert '<p>Welcome: test@mail.com</p>' in html
+
+def test_user_logout_without_authenticated_user(client, application):
+
+    response = client.get("/logout",follow_redirects=True)
+    assert response.status_code == 200
+    assert response.request.path == '/login'
+    assert b'Please log in to access this page.' in response.data
+    assert b'<h2>Login</h2>' in response.data    
+
+def test_user_logout(client, application):
+    # first login before to logout
+    test_login_and_redirect_to_dashboard(client, application)
+
+    response = client.get("/logout",follow_redirects=True)
+    assert response.status_code == 200
+    assert response.request.path == '/login'
+    assert b'<h2>Login</h2>' in response.data
+    

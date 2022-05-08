@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash
 from app.auth.decorators import admin_required
 from app.db import db
 from app.db.models import User
-from app.auth.forms import login_form, register_form
+from app.auth.forms import login_form, register_form, profile_form
 auth = Blueprint('auth', __name__, template_folder='templates')
 
 @auth.route('/register', methods=['POST', 'GET'])
@@ -56,5 +56,26 @@ def login():
 def dashboard(page):
     return render_template('dashboard.html')
 
+@auth.route("/logout")
+@login_required
+def logout():
+    """Logout the current user."""
+    user = current_user
+    user.authenticated = False
+    db.session.add(user)
+    db.session.commit()
+    logout_user()
+    return redirect(url_for('auth.login'))
 
-
+@auth.route('/profile', methods=['POST', 'GET'])
+@login_required
+def edit_profile():
+    user = User.query.get(current_user.get_id())
+    form = profile_form(obj=user)
+    if form.validate_on_submit():
+        user.about = form.about.data
+        db.session.add(current_user)
+        db.session.commit()
+        flash('You Successfully Updated your Profile', 'success')
+        return redirect(url_for('auth.dashboard'))
+    return render_template('profile_edit.html', form=form)
