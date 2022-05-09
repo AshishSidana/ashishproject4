@@ -7,6 +7,18 @@ from app.db import db
 from flask_login import UserMixin
 from sqlalchemy_serializer import SerializerMixin
 
+class AccountTransaction(db.Model,SerializerMixin):
+    __tablename__ = 'account_transaction'
+    id = db.Column(db.Integer, primary_key=True)
+    amount = db.Column(db.Integer, nullable=False, unique=False, server_default='0')
+    transaction_type = db.Column(db.String(300), nullable=True, unique=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    def __init__(self, amount, transaction_type, user_id):
+        self.amount = amount
+        self.transaction_type = transaction_type
+        self.user_id = user_id
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -17,9 +29,8 @@ class User(UserMixin, db.Model):
     registered_on = db.Column('registered_on', db.DateTime)
     active = db.Column('is_active', db.Boolean(), nullable=False, server_default='1')
     is_admin = db.Column('is_admin', db.Boolean(), nullable=False, server_default='0')
-
-    # `roles` and `groups` are reserved words that *must* be defined
-    # on the `User` model to use group- or role-based authorization.
+    account_balance = db.Column(db.Integer, nullable=False, server_default='0')
+    account_transaction = db.relationship("AccountTransaction", backref="user", cascade="all, delete")
 
     def __init__(self, email, password):
         self.email = email
